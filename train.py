@@ -58,7 +58,6 @@ def phaseDuration(junction, phase_time, phase_state):
     traci.trafficlight.setPhaseDuration(junction, phase_time)
 
 
-
 class Model(nn.Module):
     def __init__(self, lr, input_dims, fc1_dims, fc2_dims, n_actions):
         super(Model, self).__init__()
@@ -260,9 +259,9 @@ def run(train=True,model_name="model",epochs=50,steps=500,ard=False):
         step = 0
         total_time = 0
         min_duration = 5
-        
-        #for testing sinmulation comparison
-        wt_per_step =  0
+
+        #for testing simulation comparsion
+        wt_per_step  =  0
         wt_list = []
         
         traffic_lights_time = dict()
@@ -286,7 +285,7 @@ def run(train=True,model_name="model",epochs=50,steps=500,ard=False):
                 waiting_time = get_waiting_time(controled_lanes)
                 total_time += waiting_time
                 wt_per_step += waiting_time
-                
+
                 if traffic_lights_time[junction] == 0:
                     vehicles_per_lane = get_vehicle_numbers(controled_lanes)
                     # vehicles_per_lane = get_vehicle_numbers(all_lanes)
@@ -321,11 +320,11 @@ def run(train=True,model_name="model",epochs=50,steps=500,ard=False):
                         brain.learn(junction_number)
                 else:
                     traffic_lights_time[junction] -= 1
-                    
-            step += 1
+
             wt_list.append(wt_per_step)
             wt_per_step = 0
-            
+            step += 1
+
         print("total_time",total_time)
         total_time_list.append(total_time)
 
@@ -338,27 +337,23 @@ def run(train=True,model_name="model",epochs=50,steps=500,ard=False):
         sys.stdout.flush()
         if not train:
             break
+
     if train:
         plt.plot(list(range(len(total_time_list))),total_time_list)
         plt.xlabel("epochs")
         plt.ylabel("total time")
         plt.savefig(f'plots/time_vs_epoch_{model_name}.png')
         # plt.show()
-    
+
     else:
-        model_dir = f"plots_testing/{model_name}"
-        try:
-            os.mkdir(model_dir)
-        except OSError as error:
-            pass
-        with open(f'{model_dir}/waiting_time.txt', 'w') as f:
+        with open(f'plots/{model_name}_waiting_time.txt', 'w') as f:
             for line in wt_list:
                 f.write(f"{line}\n")
                 
         plt.plot(list(range(len(wt_list))),wt_list)
         plt.xlabel("steps")
         plt.ylabel("total time")
-        plt.savefig(f'{model_dir}/waiting_time.png')
+        plt.savefig(f'plots/test_time_vs_epoch_{model_name}.png')
         plt.show()
 
 def get_options():
